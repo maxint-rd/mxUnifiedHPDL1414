@@ -27,8 +27,10 @@ HPDL1414 pinout
 
 ### Wiring your I/O expander
 The library has expanded pins 1-7 reserved for D0 to D6. Expanded pin 0 can be used for your own purpose such as a buzzer or blinking LED. Expanded pins 8 and 9 are used for A0 and A1. Expanded pins 10 and up are used as the !WR line of each module. Using a 16-bit I/O expander, up to 6 modules can be connected.
-When only 8 expanded pins are ;available A0, A1, !WR0 and !WR1 can be connected directly to available MCU pins. These then need to be specified in the constructor. Alternatively the virtual expanded pins of the mxUnifiedIO base class can also be used for the data pins.
-See the pinout diagram above to find the various pins. (Note the notch on pin 1).
+
+When only 8 expanded pins are available; A0, A1, !WR0 and !WR1 can be connected directly to available MCU pins. These then need to be specified in the constructor. Alternatively the virtual expanded pins of the mxUnifiedIO base class can also be used for the data pins.
+
+Check out the pinout diagram above or the [datasheet](documentation/datasheetHPDL1414.pdf) to find the various pins. Note there is a notch to indicate pin 1.
 
 # References
 - Part of this library is based on the [HPDL1414 library by Marek](https://github.com/marecl/HPDL1414/)
