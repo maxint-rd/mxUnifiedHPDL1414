@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring For mxUnifiedHPDL1414
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+mxUnifiedHPDL1414	KEYWORD1
+
+#######################################
+# Methods and Functions	(KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+clear	KEYWORD2
+setOverflow	KEYWORD2
+getNumModules	KEYWORD2
+getNumDigits	KEYWORD2
+write	KEYWORD2
+print	KEYWORD2
+println	KEYWORD2
+setCursor	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
