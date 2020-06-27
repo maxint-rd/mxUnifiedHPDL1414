@@ -120,18 +120,6 @@ void mxUnifiedHPDL1414::writeChr(uint8_t ch)
 */
 size_t mxUnifiedHPDL1414::write(uint8_t ch)
 {
-	// Implement wrapping. Allow negative position to support easy scrolling
-	if(_nPrintPos<0)
-	{
-		_nPrintPos++;
-		return 1;	// returning zero will stop printing rest of the string
-	}
-  if (_nPrintPos >= this->_nMaxDigits)
-  {
-    if (_fAllowOverflow) _nPrintPos = 0;
-    else return 0;
-  }
-
 	// reset cursor position after new line, return or end of string
 	if(ch=='\0' || ch=='\n' || ch=='\r')	//  || _nPrintPos>=_nMaxDigits)
 	{
@@ -143,6 +131,18 @@ size_t mxUnifiedHPDL1414::write(uint8_t ch)
 		_nPrintPos=0;
 		return(0);	// returning zero will stop printing rest of the string
 	}
+
+	// Implement wrapping. Allow negative position to support easy scrolling
+	if(_nPrintPos<0)
+	{
+		_nPrintPos++;
+		return 1;	// returning zero will stop printing rest of the string
+	}
+  if (_nPrintPos >= this->_nMaxDigits)
+  {
+    if (_fAllowOverflow) _nPrintPos = 0;
+    else return 0;
+  }
 
 	// actually write a character to the display at the current position
 	this->writeChr(ch);
