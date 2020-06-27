@@ -24,33 +24,33 @@ mxUnifiedHPDL1414::mxUnifiedHPDL1414(mxUnifiedIO *pUniOut, int8_t nPinA0, int8_t
 	_nNumModules=(nPinNotWR1==0)?1:2;
 	_nMaxDigits=_nNumModules*4;
 
-  _nPin_A0=nPinA0;    		// regular pin or set to 0 to use expanded pin 7
-  _nPin_A1=nPinA1;    		// regular pin or set to 0 to use expanded pin 8
-  _nPin_NotWR0=nPinNotWR0;		// regular pin or set to 0 to use expanded pin 9
-  _nPin_NotWR1=nPinNotWR1;		// regular pin or set to 0 to use expanded pin 10
-  
-  _nPrintPos=0;
+	_nPin_A0=nPinA0;    		// regular pin or set to 0 to use expanded pin 7
+	_nPin_A1=nPinA1;    		// regular pin or set to 0 to use expanded pin 8
+	_nPin_NotWR0=nPinNotWR0;		// regular pin or set to 0 to use expanded pin 9
+	_nPin_NotWR1=nPinNotWR1;		// regular pin or set to 0 to use expanded pin 10
+	
+	_nPrintPos=0;
 }
 
 void mxUnifiedHPDL1414::strobeWritePin(uint8_t nPin, bool fVirtual)
 {
 	if(fVirtual)
 	{
-	  //Serial.print(F("~"));
-	  //Serial.print(nPin);
+		//Serial.print(F("~"));
+		//Serial.print(nPin);
 		_pUniOut->digitalWrite(nPin, LOW);
-	  delayMicroseconds(1); // Needs ~150ns so it's okay
-	  _pUniOut->digitalWrite(nPin, HIGH);
-	  delayMicroseconds(1);
+		delayMicroseconds(1); // Needs ~150ns so it's okay
+		_pUniOut->digitalWrite(nPin, HIGH);
+		delayMicroseconds(1);
 	}
 	else
 	{
-	  //Serial.print(F("^"));
-	  //Serial.print(nPin);
-	  digitalWrite(nPin, LOW);
-	  delayMicroseconds(1); // Needs ~150ns so it's okay
-	  digitalWrite(nPin, HIGH);
-	  delayMicroseconds(1);
+		//Serial.print(F("^"));
+		//Serial.print(nPin);
+		digitalWrite(nPin, LOW);
+		delayMicroseconds(1); // Needs ~150ns so it's okay
+		digitalWrite(nPin, HIGH);
+		delayMicroseconds(1);
 	}
 }
 
@@ -70,20 +70,20 @@ void mxUnifiedHPDL1414::setDigitAddress(uint8_t a)
 {	// Set the address lines for a particular digit of a segment.
 	// Note: Address 0 is normally the rightmost digit. Using ! before the address-bit reverses the digit position.
 	if(_nPin_A0!=0)
-  	digitalWrite(_nPin_A0, !(a & 0x01));
-  else
-  	_pUniOut->digitalWrite(_nVPin_A0, !(a & 0x01));
-  	
-	if(_nPin_A1!=0)
-	  digitalWrite(_nPin_A1, !(a & 0x02));
+		digitalWrite(_nPin_A0, !(a & 0x01));
 	else
-	  _pUniOut->digitalWrite(_nVPin_A1, !(a & 0x02));
+		_pUniOut->digitalWrite(_nVPin_A0, !(a & 0x01));
+
+	if(_nPin_A1!=0)
+		digitalWrite(_nPin_A1, !(a & 0x02));
+	else
+		_pUniOut->digitalWrite(_nVPin_A1, !(a & 0x02));
 }
 
 char mxUnifiedHPDL1414::translate(char i) {
-  if (i > 31 && i < 96) return i;
-  else if (i > 96 && i < 123) return i - 32;
-  return 32;
+	if (i > 31 && i < 96) return i;
+	else if (i > 96 && i < 123) return i - 32;
+	return 32;
 }
 
 
@@ -100,14 +100,14 @@ void mxUnifiedHPDL1414::writeChr(uint8_t ch)
 #endif
 
 	//Serial.print(F("==>"));
-  byte nMod = (_nPrintPos - (_nPrintPos % 4)) / 4;
-  setDigitAddress(_nPrintPos);
+	byte nMod = (_nPrintPos - (_nPrintPos % 4)) / 4;
+	setDigitAddress(_nPrintPos);
 	//Serial.print(F("mod:"));
 	//Serial.print(nMod);
-  ch = translate(ch);
-  for (byte n = 0; n < 7; n++)
-    _pUniOut->digitalWrite(_nVPin_D0+n, ((ch >> n) & 0x01));			// assume datapins on virtual pins 1-7 (pin 0 available for blinking led or something else
-
+	ch = translate(ch);
+	for (byte n = 0; n < 7; n++)
+		_pUniOut->digitalWrite(_nVPin_D0+n, ((ch >> n) & 0x01));			// assume datapins on virtual pins 1-7 (pin 0 available for blinking led or something else
+	
 	strobeWriteModule(nMod);
 	//Serial.println(F("."));
 }
@@ -138,52 +138,41 @@ size_t mxUnifiedHPDL1414::write(uint8_t ch)
 		_nPrintPos++;
 		return 1;	// returning zero will stop printing rest of the string
 	}
-  if (_nPrintPos >= this->_nMaxDigits)
-  {
-    if (_fAllowOverflow) _nPrintPos = 0;
-    else return 0;
-  }
+	if (_nPrintPos >= this->_nMaxDigits)
+	{
+		if (_fAllowOverflow) _nPrintPos = 0;
+		else return 0;
+	}
 
 	// actually write a character to the display at the current position
 	this->writeChr(ch);
 	_nPrintPos++;
-  return(1);
+	return(1);
 }
 
 void mxUnifiedHPDL1414::clear(void)
 {	// Clear the digits of all modules 
-  // Set character data pins to zero
-  for (byte n = 0; n < 7; n++)
-    _pUniOut->digitalWrite(_nVPin_D0+n, LOW);
-
+	// Set character data pins to zero
+	for (byte n = 0; n < 7; n++)
+		_pUniOut->digitalWrite(_nVPin_D0+n, LOW);
+	
 	// Set the digit addresses and strobe the write pin of each module.
 	// Nested loop is slightly slower due to to extra strobes of module write,
 	// Faster way is to select all modules for writing and then sweep the digits
-  for (byte nMod = 0; nMod < this->_nNumModules; nMod++)
-	  for (byte a = 0; a < 4; a++)
-	  {
-	    this->setDigitAddress(a);
-	    strobeWriteModule(nMod);
-	  }
-
-  _nPrintPos = 0;
+	for (byte nMod = 0; nMod < this->_nNumModules; nMod++)
+		for (byte a = 0; a < 4; a++)
+		{
+			this->setDigitAddress(a);
+			strobeWriteModule(nMod);
+		}
+	
+	_nPrintPos = 0;
 };
 
 void mxUnifiedHPDL1414::setCursor(int8_t nPos)
 {	// Set the print position. Allow negative numbers to support scrolling
   _nPrintPos = nPos;
 }
-
-
-/* MMOLE: not called by print()
-size_t mxUnifiedHPDL1414::write(const char *str)
-{
-	Serial.println(F("write str"));
-	setDisplayToString(str);
-	_nPrintPos=0;
-}
-*/
-
 
 
 void mxUnifiedHPDL1414::begin()
@@ -199,21 +188,21 @@ void mxUnifiedHPDL1414::begin()
 	}
 	if(_nPin_A1!=0)
 	{
-	  pinMode(_nPin_A1, OUTPUT);
-	  digitalWrite(_nPin_A1, LOW);
+		pinMode(_nPin_A1, OUTPUT);
+		digitalWrite(_nPin_A1, LOW);
 	}
 	
 	if(_nPin_NotWR0!=0)
 	{
-	  pinMode(_nPin_NotWR0, OUTPUT);
-	  digitalWrite(_nPin_NotWR0, HIGH);
+		pinMode(_nPin_NotWR0, OUTPUT);
+		digitalWrite(_nPin_NotWR0, HIGH);
 	}
 	if(_nPin_NotWR1!=0)
 	{
-	  pinMode(_nPin_NotWR1, OUTPUT);
-	  digitalWrite(_nPin_NotWR1, HIGH);
+		pinMode(_nPin_NotWR1, OUTPUT);
+		digitalWrite(_nPin_NotWR1, HIGH);
 	}
-	
+
 	if(fOnlyVirtualPins)
 	{
 		_pUniOut->digitalWrite(_nVPin_A0, LOW);		
@@ -226,8 +215,8 @@ void mxUnifiedHPDL1414::begin()
 	for(int n=0; n<7; n++)
 		_pUniOut->digitalWrite(_nVPin_D0+n, LOW);
 
-  _nPrintPos = 0;
-  _fAllowOverflow = false;
+	_nPrintPos = 0;
+	_fAllowOverflow = false;
 	
 	// clear display
 	clear();
@@ -236,15 +225,15 @@ void mxUnifiedHPDL1414::begin()
 
 void mxUnifiedHPDL1414::setOverflow(bool fAllowOverflow)
 {	// set if Overflowing characters should be wrapped and printed
-  _fAllowOverflow = fAllowOverflow;
+	_fAllowOverflow = fAllowOverflow;
 };
 
 uint8_t mxUnifiedHPDL1414::getNumModules(void)
 {	// Return how many modules are configured
-  return this->_nNumModules;
+	return this->_nNumModules;
 }
 
 uint8_t mxUnifiedHPDL1414::getNumDigits(void)
 {	// Return how many digits are available
-  return this->_nMaxDigits;
+	return this->_nMaxDigits;
 }

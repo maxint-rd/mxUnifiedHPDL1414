@@ -19,7 +19,7 @@ HPDL1414 pinout
 
 Library made by Maxint R&D to drive the HPDL1414 display module via an 
 I2C I/O expander or the 74HC595 shift register using the mxUnifiedIO API.
-For more information ee https://github.com/maxint-rd/mxUnifiedIO
+For more information see https://github.com/maxint-rd/mxUnifiedIO
 *********************************************************************/
 #ifndef _MXUNIFIEDHPDL1414_H
 #define _MXUNIFIEDHPDL1414_H
@@ -29,46 +29,45 @@ For more information ee https://github.com/maxint-rd/mxUnifiedIO
 class mxUnifiedHPDL1414 : public Print
 {
  public:
- 	mxUnifiedHPDL1414(mxUnifiedIO *pUniOut, int8_t nNumModules);	// use expanded pins 1-7 for data, expanded pins 8,9 A0 and A1, expanded pins 10,11,... for the _WR (one per module)
- 	mxUnifiedHPDL1414(mxUnifiedIO *pUniOut, int8_t nPinA0, int8_t nPinA1, int8_t nPinNotWR0, int8_t nPinNotWR1=0);		  	// use only expanded pins 1-7 for data, specify regular pins for A0 and A1, and for the _WR (max two modules)
+	mxUnifiedHPDL1414(mxUnifiedIO *pUniOut, int8_t nNumModules);	// use expanded pins 1-7 for data, expanded pins 8,9 A0 and A1, expanded pins 10,11,... for the _WR (one per module)
+	mxUnifiedHPDL1414(mxUnifiedIO *pUniOut, int8_t nPinA0, int8_t nPinA1, int8_t nPinNotWR0, int8_t nPinNotWR1=0);		  	// use only expanded pins 1-7 for data, specify regular pins for A0 and A1, and for the _WR (max two modules)
 
-  void clear();
-  void begin();
+	void clear();
+	void begin();
 	void setOverflow(bool fAllowOverflow);
 	uint8_t getNumModules(void);
 	uint8_t getNumDigits(void);
 	void writeChr(uint8_t ch);		// write a character at the current position
 	
-  // support for the Print class, see https://playground.arduino.cc/Code/Printclass
-  void setCursor(int8_t nPos); 	// allows setting negative to support scrolled printing
-  using Print::write; // pull in write(str) and write(buf, size) from Print
-  virtual size_t write(uint8_t ch);
-  /* virtual size_t write(const char *str); */   // MMOLE: not called by print()
+	// support for the Print class, see https://playground.arduino.cc/Code/Printclass
+	void setCursor(int8_t nPos); 	// allows setting negative to support scrolled printing
+	using Print::write; // pull in write(str) and write(buf, size) from Print
+	virtual size_t write(uint8_t ch);
 
  private:
-  mxUnifiedIO *_pUniOut;
-  int8_t _nPin_A0;    		// regular pin or set to 0 to use expanded pin 7
-  int8_t _nPin_A1;    		// regular pin or set to 0 to use expanded pin 8
-  int8_t _nPin_NotWR0;		// regular pin or set to 0 to use expanded pin 9
-  int8_t _nPin_NotWR1;		// regular pin or set to 0 to use expanded pin 10
+	mxUnifiedIO *_pUniOut;
+	int8_t _nPin_A0;    		// regular pin or set to 0 to use expanded pin 7
+	int8_t _nPin_A1;    		// regular pin or set to 0 to use expanded pin 8
+	int8_t _nPin_NotWR0;		// regular pin or set to 0 to use expanded pin 9
+	int8_t _nPin_NotWR1;		// regular pin or set to 0 to use expanded pin 10
 	uint8_t _nNumModules;
 	uint8_t _nMaxDigits;
 
-  void strobeWritePin(uint8_t nPin, bool fVirtual);
-  void strobeWriteModule(uint8_t nModule);
+	void strobeWritePin(uint8_t nPin, bool fVirtual);
+	void strobeWriteModule(uint8_t nModule);
 	void setDigitAddress(uint8_t a);
 	
-	static const int8_t _nVPin_D0=1;			// assume datapins on virtual pins 1-7 (pin 0 available for blinking led or something else
+	static const int8_t _nVPin_D0=1;			// assume datapins on virtual pins 1-7 (pin 0 available for blinking led or something else)
 	static const int8_t _nVPin_A0=8;
 	static const int8_t _nVPin_A1=9;
 	static const int8_t _nVPin_NotWR0=10;
 
 
-  // support for the Print class
+	// support for the Print class
 	int8_t _nPrintPos;			// current print position (can be negative for easy scrolling)
 
-  char translate(char);
-  bool _fAllowOverflow;
+	char translate(char);
+	bool _fAllowOverflow;
 };
 
 #endif
